@@ -1,0 +1,9 @@
+*.xml
+*.bz2
+venv
+*/__pycache__
+*.pyc
+*~
+*#*
+.tox
+ovaltools.egg-info

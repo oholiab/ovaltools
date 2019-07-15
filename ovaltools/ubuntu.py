@@ -4,10 +4,19 @@ import re
 
 release_parse = lambda x: re.match('^oval:com\.ubuntu\.(.+):def:100$', x)[1]
 
-class Vulnerability(OvalObject):
+class Criterion(OvalObject):
     def __init__(self, xml):
         super().__init__(xml)
+        self._test_ref = ""
 
+    def ref(self):
+        if self._test_ref == "":
+            self._test_ref = self.xml.get('test_ref')
+        if self._ref == "":
+            self._ref = self._test_ref.split(":")[-1]
+        return self._ref
+
+class Vulnerability(OvalObject):
     def title(self):
         return self.xpath('oval-def:metadata/oval-def:title')[0].text
 
@@ -22,17 +31,45 @@ class Vulnerability(OvalObject):
         # These are not all of them, just the ones I care about.
         # TODO: Fix me, ensure that assumption that this is OR is correct
         criteria = self.xpath('oval-def:criteria//oval-def:criterion')
-        return [criterion.attrib for criterion in criteria]
+        return [Criterion(criterion) for criterion in criteria]
 
-class Criterion(OvalObject):
-    pass
+class DpkgInfoState(OvalObject):
+    def __init__(self, xml):
+        super().__init__(xml)
+        self._version_string = None
+        self._evr = None
+
+    def version_string(self):
+        if self._evr is None or self._version_string is None:
+            self._evr = self.xpath('linux-def:evr')[0]
+            self._version_string = self._evr.text
+        return self._version_string
 
 class DpkgInfo(OvalObject):
-    pass
+    def __init__(self, xml):
+        super().__init__(xml)
+        self._names = []
+        self._var_refs = []
+
+    def names(self):
+        if self._names == []:
+            names = self.xpath('linux-def:name')
+            for name in names:
+                if name.text == None:
+                    # Need to add some code to look up name from this
+                    self._var_refs.append(name.get('var_ref'))
+                else:
+                    self._names.append(name.text)
+            for var_ref in self._var_refs:
+                for value in self.xpath(f"//oval-def:constant_variable[@id='{var_ref}']/oval-def:value"):
+                    self._names.append(value.text)
+        return self._names
 
 class UbuntuOval:
     def __init__(self, oval_file_path):
         self._vulnerabilities = []
+        self._dpkg_info = []
+        self._dpkg_info_states = []
         self.xml = etree.parse(oval_file_path)
         self.xml_element = self.xml.getroot()
         self.namespaces = self.xml_element.nsmap
@@ -54,5 +91,21 @@ class UbuntuOval:
             self._parse_vulnerabilities()
         return self._vulnerabilities
 
+    def dpkg_info(self):
+        if self._dpkg_info == []:
+            self._parse_dpkg_info()
+        return self._dpkg_info
+
+    def dpkg_info_states(self):
+        if self._dpkg_info_states == []:
+            self._parse_dpkg_info_states()
+        return self._dpkg_info_states
+
+    def _parse_dpkg_info_states(self):
+        self._dpkg_info_states = [DpkgInfoState(xml) for xml in self.xpath("//linux-def:dpkginfo_state")]
+
     def _parse_vulnerabilities(self):
         self._vulnerabilities = [Vulnerability(xml) for xml in self.xpath("//oval-def:definition[@class='vulnerability']")]
+
+    def _parse_dpkg_info(self):
+        self._dpkg_info = [DpkgInfo(xml) for xml in self.xpath("//linux-def:dpkginfo_object")]

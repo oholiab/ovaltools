@@ -1,4 +1,5 @@
 OVAL_URL=https://people.canonical.com/~ubuntu-security/oval
+TOX_ARGS?=
 PHONY: run get_oval
 
 env:
@@ -25,5 +26,8 @@ rerun:
 interactive:
 	ipython -i ipython/preload.py
 
+test_skipslow:
+	make TOX_ARGS=--skipslow test
+
 test:
-	tox
+	tox -- $(TOX_ARGS)

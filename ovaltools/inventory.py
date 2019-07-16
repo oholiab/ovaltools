@@ -1,3 +1,7 @@
+import subprocess
+
+__dummy__ = False
+
 def compare_versions(version1, operator, version2):
     if __dummy__ == True:
         cmd = "true"

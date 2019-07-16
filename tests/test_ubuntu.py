@@ -30,6 +30,11 @@ def test_vulnerability_attributes(ubuntu_oval):
     assert vuln.title() == 'CVE-2002-2439 on Ubuntu 18.04 LTS (bionic) - low.'
     assert vuln.references()[0]['ref_url'] == 'https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2002-2439'
 
+def test_usns(ubuntu_oval):
+    vuln = ubuntu_oval.vulnerabilities()[3300] #Random sample with a USN in, sorry :(
+    assert "https://usn.ubuntu.com/usn/usn-3916-1" in vuln.advisory_references()
+    assert vuln.usns() == ['USN-3916-1']
+
 def test_dpkg_info(ubuntu_oval):
     assert ubuntu_oval._dpkg_info == []
     info = ubuntu_oval.dpkg_info()[0]

@@ -2,6 +2,9 @@ from lxml import etree
 from ovaltools.common import OvalObject
 import re
 
+usn_url = "https://usn.ubuntu.com/usn/"
+usn_url_length = len(usn_url)
+
 release_parse = lambda x: re.match('^oval:com\.ubuntu\.(.+):def:100$', x)[1]
 
 class Criterion(OvalObject):
@@ -17,6 +20,12 @@ class Criterion(OvalObject):
         return self._ref
 
 class Vulnerability(OvalObject):
+    def __init__(self, xml):
+        super().__init__(xml)
+        self._severity = None
+        self._advisory_references = []
+        self._usns = []
+
     def title(self):
         return self.xpath('oval-def:metadata/oval-def:title')[0].text
 
@@ -26,6 +35,27 @@ class Vulnerability(OvalObject):
     def references(self):
         references = self.xpath('oval-def:metadata/oval-def:reference')
         return [ref.attrib for ref in references]
+
+    def severity(self):
+        if self._severity == None:
+            severity = self.xpath('oval-def:metadata/oval-def:advisory/oval-def:severity')
+            if severity != []:
+                self._severity = severity[0].text
+            else:
+                self._severity = ""
+        return self._severity
+
+    def advisory_references(self):
+        if self._advisory_references == []:
+            self._advisory_references = [ref.text for ref in self.xpath('oval-def:metadata/oval-def:advisory/oval-def:ref')]
+        return self._advisory_references
+
+    def usns(self):
+        if self._usns == []:
+            for reference in self.advisory_references():
+                if reference[:usn_url_length] == usn_url:
+                    self._usns.append(reference[usn_url_length:].upper())
+        return self._usns
 
     def criteria(self):
         # These are not all of them, just the ones I care about.

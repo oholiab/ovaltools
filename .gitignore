@@ -6,3 +6,4 @@ venv
 *#*
 .tox
 ovaltools.egg-info
+com.ubuntu.bionic.cve.oval.xml

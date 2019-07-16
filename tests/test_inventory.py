@@ -40,4 +40,4 @@ def test_vulnerable(ubuntu_oval, inventory_vuln_unbound):
     i.process(u)
     assert i.package_match_refs == {unbound_vuln_ref: [unbound_vuln_package]}
     assert i.vulnerable_to_refs == {unbound_vuln_ref: [unbound_vuln_package]}
-    assert i.usns == ['bleh']
+    assert i.usns == ['USN-3673-1']

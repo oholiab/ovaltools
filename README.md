@@ -41,7 +41,7 @@ u = UbuntuOval('some.oval.file.xml')
 i.process(u)
 ```
 
-`i.vulnerable_to_refs` will now be populated with a dict of the format `{oval_ref_number: [vulnerable_package, ...]}`
+`i.vulnerable_to_refs` will now be populated with a dict of the format `{oval_ref_number: [vulnerable_package, ...]}` and `i.usns` will now be populated with all the Ubuntu Security Notice IDs that the machine is vulnerable to!
 
 I've not done the work yet to translate these reference numbers (or `ref`s) back to vulnerabilities, but it's not a lot of work.
 

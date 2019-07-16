@@ -14,6 +14,7 @@ class Inventory():
         self.package_name_version_dict = {}
         self.package_match_refs = {}
         self.vulnerable_to_refs = {}
+        self.usns = []
 
     def ingest_dpkg(self, listing):
         """dpkg-query --showformat='${Package} ${Version}\n' --show"""
@@ -41,3 +42,8 @@ class Inventory():
                             self.vulnerable_to_refs[state.ref()] = [package]
                         else:
                             self.vulnerable_to_refs[state.ref()].append(package)
+        #FIXME: I will be much faster if integrated into one of the previous loops over the manifest rather than searching each time by ID
+        for ref in self.vulnerable_to_refs.keys():
+            vuln = oval_manifest.get_vulnerabilities_by_ref(ref)
+            for usn in vuln.usns():
+                self.usns.append(usn)

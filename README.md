@@ -6,6 +6,15 @@
 
 Currently it only works for Ubuntu, and (very likely) only `bionic` (18.04) because I suspect that the format *may* be different for other releases (although I've not verified yet)
 
+## Dependencies
+### System
+You need to have `dpkg` installed. (PROTIP: `brew install dpkg` on a mac totally works, can't install things on your system but still allows you to `dpkg compare-versions` which is all we need!)
+
+### Python
+If you have `virtualenv` just `make venv` and then `source venv/bin/activate`
+
+Tests just require `tox`
+
 ## How do I even?
 This library isn't even minimal viable product yet, so the best way to try and get your head around it is to have a look at the tests. There are two main objects you need to concern yourself with: `UbuntuOval` and `Inventory`. The `UbuntuOval` object represents the vulnerability information contained in the OVAL XML file, and the `Inventory` represents a given host. 
 

@@ -7,13 +7,6 @@ env:
 
 get_oval: com.ubuntu.bionic.cve.oval.xml
 
-.docker:
-	docker build -t ovaltools $(DOCKER_BUILD_ARGS) .
-	touch $@
-
-run:
-	docker run --rm -it ovaltools
-
 com.ubuntu.bionic.cve.oval.xml:
 	wget $(OVAL_URL)/$@.bz2
 	bunzip2 $@.bz2

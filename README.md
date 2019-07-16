@@ -44,3 +44,11 @@ get_oval: will fetch the latest `bionic` oval file
 test: will run the tests
 test_skipslow: will run all but the tests marked as `slow`
 ```
+
+## Intended architecture
+In theory, this should be able to run like so:
+
+* Each host contains a cron entry to dump the `dpkg-query ...` command above every N minutes, and (along with the info in `/etc/lsb_release`) either HTTP `POST` to a service or simply dump in an S3 bucket with an object name defined by it's unique fqdn.
+* The library is incorporated into a batch job which looks for completed writes (probably read off of an SQS queue) and determines the USNs which affect a given host and for which packages.
+* The batch job then writes to a datastore (RDS?) updating each *vulnerability* with which hosts are vulnerable to it - this allows us to produce ubiquity information for the vulnerability so the database can be used as a risk register! It can be enriched with severity metadata about the vulnerabilities to assist in solving the vulnerability for the infrastructure rather than patching hosts individually.
+* The same batch job or another crawls the datastore expiring any information that is older than (say) 3N minutes, so for a periodicity of 5 minute cron jobs your vulnerability information is on the order of 15-20 minutes old.

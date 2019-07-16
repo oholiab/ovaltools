@@ -39,4 +39,4 @@ def test_vulnerable(ubuntu_oval, inventory_vuln_unbound):
     unbound_vuln_package = 'unbound'
     i.process(u)
     assert i.package_match_refs == {unbound_vuln_ref: [unbound_vuln_package]}
-    assert i.vulnerable_to_refs == {unbound_vuln_package: [unbound_vuln_ref]}
+    assert i.vulnerable_to_refs == {unbound_vuln_ref: [unbound_vuln_package]}

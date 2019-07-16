@@ -1,12 +1,7 @@
 import subprocess
 
-__dummy__ = False
-
 def compare_versions(version1, operator, version2):
-    if __dummy__ == True:
-        cmd = "true"
-    else:
-        cmd = f"dpkg --compare-versions {version1} {operator} {version2}"
+    cmd = f"dpkg --compare-versions {version1} {operator} {version2}"
     returncode = subprocess.run(cmd.split(" ")).returncode
     if returncode == 0:
         return True
@@ -39,9 +34,9 @@ class Inventory():
                     else:
                         self.package_match_refs[info.ref()].append(package_name)
         for state in oval_manifest.dpkg_info_states():
-            if state.ref in self.package_match_refs.keys():
-                for package in package_match_refs[state.ref()]:
-                    if compare_versions(package_name_version_dict[package], 'lt', state.version_string):
+            if state.ref() in self.package_match_refs.keys():
+                for package in self.package_match_refs[state.ref()]:
+                    if compare_versions(self.package_name_version_dict[package], 'lt', state.version_string()):
                         if self.vulnerable_to_refs.get(state.ref()) is None:
                             self.vulnerable_to_refs[state.ref()] = [package]
                         else:

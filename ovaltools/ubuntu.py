@@ -121,6 +121,11 @@ class UbuntuOval:
             self._parse_vulnerabilities()
         return self._vulnerabilities
 
+    def get_vulnerabilities_by_ref(self, ref):
+        for vuln in self.vulnerabilities():
+            if vuln.ref() == ref:
+                return vuln
+
     def dpkg_info(self):
         if self._dpkg_info == []:
             self._parse_dpkg_info()

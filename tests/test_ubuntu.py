@@ -65,6 +65,11 @@ def test_criterion(ubuntu_oval):
     vuln = list(filter(lambda x: x._id == f"oval:com.ubuntu.bionic:def:{ref}", ubuntu_oval.vulnerabilities()))[0]
     assert vuln.criteria()[0].ref() == ref
 
-def can_find_package(ubuntu_oval):
+@pytest.mark.slow
+def test_can_find_package(ubuntu_oval):
     roundcube_infos = [dpkg_info for dpkg_info in ubuntu_oval.dpkg_info() if "roundcube" in dpkg_info.names()]
     assert roundcube_infos[0].ref() == '201140780000000'
+
+@pytest.mark.slow
+def test_can_search_by_ref(ubuntu_oval):
+    assert ubuntu_oval.get_vulnerabilities_by_ref('201140780000000').ref() == '201140780000000'
